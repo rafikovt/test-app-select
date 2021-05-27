@@ -1,13 +1,19 @@
 <template>
   <div id="app">
     <h1 v-if="$store.state.onLoading">Загрузка</h1>
-    <h1 v-else-if="$store.state.onError" class="danger">Ошибка соединения, попробуйте позже</h1>
-    <h2>Время загрузки {{$store.state.counter}} мс</h2>
+    <h1 v-else-if="$store.state.onError" class="danger">
+      Ошибка соединения, попробуйте позже
+    </h1>
+    <h2>Время загрузки {{ $store.state.counter }} мс</h2>
     <div class="container" :key="refreshToken">
-      <Mselect v-for="(select, index) in selectData" :key="index" :options="select"    />
-      <List :values="values" />
-    </div> 
-    
+      <Mselect
+        v-for="(select, index) in selectData"
+        :key="index"
+        :options="select"
+      />
+      <List />
+    </div>
+
     <button @click.prevent="undo">Назад</button>
     <button @click.prevent="redo">Вперед</button>
     <button @click.prevent="resetState">Сброс</button>
@@ -16,14 +22,12 @@
 
 
 <script>
-
-import List from '@/components/List';
-import Mselect from '@/components/Mselect';
-import {undoRedoHistory} from './store/undo-redo';
-
+import List from "@/components/List";
+import Mselect from "@/components/Mselect";
+import { undoRedoHistory } from "./store/undo-redo";
 
 export default {
- components: {
+  components: {
     Mselect,
     List,
   },
@@ -32,16 +36,6 @@ export default {
     selectData() {
       return this.$store.getters.parsedData;
     },
-
-    values: {
-      get() {
-        return this.$store.state.values;
-      },
-
-      set(value) {
-        this.$store.commit('updateValues', value);
-      }
-    }
   },
 
   data() {
@@ -49,14 +43,14 @@ export default {
       onLoading: this.$store.state.onLoading,
       onError: this.$store.state.onError,
       refreshToken: 1,
-    }
+    };
   },
 
   methods: {
     resetState() {
-      this.refreshToken++
-      this.$store.commit('resetState')
-      undoRedoHistory.clearHistory()
+      this.refreshToken++;
+      this.$store.commit("resetState");
+      undoRedoHistory.clearHistory();
     },
 
     undo() {
@@ -69,9 +63,9 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch('loadData')
-  }
-}
+    this.$store.dispatch("loadData");
+  },
+};
 </script>
 
 
@@ -98,6 +92,5 @@ ul {
 }
 
 button {
-  
 }
 </style>

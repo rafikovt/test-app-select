@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios';
-import {undoRedoPlugin} from '../store/undo-redo';
+import { undoRedoPlugin } from '../store/undo-redo';
 
 Vue.use(Vuex)
 
@@ -11,7 +11,8 @@ export default new Vuex.Store({
     counter: 0,
     onLoading: false,
     onError: false,
-    values: [],
+    values: {},
+    selected: [],
   },
   mutations: {
     setData(state, data) {
@@ -19,11 +20,18 @@ export default new Vuex.Store({
     },
 
     updateValues(state, value) {
-      state.values.push(value);
+      let arr = []
+      state.values[typeof value[0]] = value;
+      for (let key in state.values) {
+        state.values[key].forEach((element) => {
+          arr.push(element);
+        });
+      }
+      state.selected = arr;
     },
 
     resetState(state) {
-      state.values = [];
+      state.values = {};
     }
   },
   actions: {
@@ -47,9 +55,8 @@ export default new Vuex.Store({
 
   getters: {
     parsedData: (state) => {
-      console.log(state.dataSelect)
       const flattened = [];
-      function flatten(arr){
+      function flatten(arr) {
         for (let item of arr) {
           if (Array.isArray(item)) {
             console.log(item)
@@ -58,27 +65,27 @@ export default new Vuex.Store({
             flattened.push(item);
           }
         }
-     }
-     flatten(state.dataSelect);
-     const strings = [];
-     const numbers = [];
-     const objects = [];
-     for (let item of flattened) {
-      if (item !== null ) {
-        switch (typeof item) {
-          case 'string': strings.push(item);
-          break;
-          case 'number': numbers.push(item);
-          break;
-          case 'object': if (Object.keys(item).length !== 0) {
-            objects.push(item);
+      }
+      flatten(state.dataSelect);
+      const strings = [];
+      const numbers = [];
+      const objects = [];
+      for (let item of flattened) {
+        if (item !== null) {
+          switch (typeof item) {
+            case 'string': strings.push(item);
+              break;
+            case 'number': numbers.push(item);
+              break;
+            case 'object': if (Object.keys(item).length !== 0) {
+              objects.push(item);
+            }
           }
         }
+
       }
-      
-     }
-     return [strings, numbers, objects];
-    }
+      return [strings, numbers, objects];
+    },
   },
 
   plugins: [undoRedoPlugin],
